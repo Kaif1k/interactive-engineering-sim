@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Основи електротехніки</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #1a1a1a;
+    --surface: #232323;
+    --surface2: #2a2a2a;
+    --surface3: #313131;
+    --card: #2e2e2e;
+    --accent: #5b5bd6;
+    --accent-hover: #6e6ee0;
+    --accent-glow: rgba(91,91,214,0.25);
+    --text: #e8e8e8;
+    --text-dim: #888;
+    --text-muted: #555;
+    --border: rgba(255,255,255,0.07);
+    --icon-bg: #3a3a3a;
+    --r-sm: 8px;
+    --r-md: 12px;
+    --r-lg: 16px;
+    --font: 'JetBrains Mono', monospace;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: var(--font);
+    color: var(--text);
+  }
+
+  .slide {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .header {
+    flex-shrink: 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 28px;
+    animation: fadeDown 0.5s ease both;
+  }
+  .header h1 {
+    font-size: clamp(16px, 2.2vw, 24px);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .body {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 200px 1fr 200px;
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .panel {
+    background: var(--surface);
+    border-radius: var(--r-lg);
+    padding: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35), 0 1px 3px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+    animation: fadeUp 0.5s ease both;
+  }
+  .panel:nth-child(1) { animation-delay: 0.1s; }
+  .panel:nth-child(3) { animation-delay: 0.2s; }
+
+  .panel-title {
+    flex-shrink: 0;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .panel-buttons {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 0;
+  }
+
+  .menu-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 10px 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    text-align: center;
+    width: 100%;
+    color: var(--text);
+    font-family: var(--font);
+    position: relative;
+    overflow: hidden;
+  }
+  .menu-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .menu-btn:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 4px 16px var(--accent-glow);
+    transform: translateY(-1px);
+  }
+  .menu-btn:hover::after { opacity: 0.07; }
+  .menu-btn:active { transform: translateY(0); }
+  .menu-btn.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 4px 20px var(--accent-glow);
+  }
+
+  .btn-icon {
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
+    background: var(--icon-bg);
+    border-radius: var(--r-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    transition: background 0.2s;
+    position: relative;
+    z-index: 1;
+  }
+  .menu-btn:hover .btn-icon { background: var(--icon-bg); border: 1px solid rgba(255,255,255,0.12); }
+
+  .btn-label {
+    font-size: clamp(12px, 1.4vw, 14px);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    width: 100%;
+  }
+
+  .center-panel {
+    background: var(--surface);
+    border-radius: var(--r-lg);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35), 0 1px 3px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+    min-height: 0;
+    animation: fadeUp 0.5s ease 0.15s both;
+  }
+  .center-title {
+    flex-shrink: 0;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .phet-wrapper {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    border-radius: var(--r-md);
+    overflow: hidden;
+  }
+  .phet-wrapper iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  .phet-frame {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #5b5bd6 0%, #7c6fe0 50%, #6b8de0 100%);
+    border-radius: var(--r-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.5s ease;
+    z-index: 1;
+  }
+  .phet-frame:hover { transform: scale(1.01); box-shadow: 0 8px 32px rgba(91,91,214,0.4); }
+  .phet-frame::before {
+    content: '';
+    position: absolute;
+    inset: -200%;
+    width: 400%;
+    height: 400%;
+    background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.05) 20px, rgba(255,255,255,0.05) 40px);
+    animation: stripeMove 3s linear infinite;
+  }
+  @keyframes stripeMove {
+    from { transform: translate(0, 0); }
+    to   { transform: translate(56px, 56px); }
+  }
+  .phet-label {
+    font-size: 20px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+
+  .footer {
+    flex-shrink: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    animation: fadeUp 0.5s ease 0.3s both;
+  }
+  .footer-text {
+    font-size: clamp(13px, 1.6vw, 16px);
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+  .btn-next {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--r-sm);
+    padding: 10px 24px;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    white-space: nowrap;
+  }
+  .btn-next:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 20px var(--accent-glow); }
+  .btn-next:active { transform: translateY(0); }
+
+  .drawer {
+    position: fixed;
+    top: 0; bottom: 0;
+    width: min(420px, 92vw);
+    background: var(--surface);
+    z-index: 100;
+    box-shadow: 0 0 60px rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.4s cubic-bezier(0.32,0.72,0,1);
+    overflow: hidden;
+  }
+  .drawer.left  { left: 0;  transform: translateX(-110%); border-right: 1px solid var(--border); }
+  .drawer.right { right: 0; transform: translateX(110%);  border-left:  1px solid var(--border); }
+  .drawer.open.left  { transform: translateX(0); }
+  .drawer.open.right { transform: translateX(0); }
+
+  .drawer-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 99;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+    backdrop-filter: blur(2px);
+  }
+  .drawer-overlay.show { opacity: 1; pointer-events: all; }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+    flex-shrink: 0;
+  }
+  .drawer-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+  }
+  .drawer-title .icon { font-size: 22px; }
+  .drawer-close {
+    width: 32px; height: 32px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    color: var(--text-dim);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, color 0.2s;
+    font-family: var(--font);
+  }
+  .drawer-close:hover { background: var(--surface3); color: var(--text); }
+
+  .drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .drawer-body::-webkit-scrollbar { width: 4px; }
+  .drawer-body::-webkit-scrollbar-track { background: transparent; }
+  .drawer-body::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+
+  .section-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: fadeUp 0.4s ease both;
+  }
+  .section-block:nth-child(1) { animation-delay: 0.05s; }
+  .section-block:nth-child(2) { animation-delay: 0.12s; }
+  .section-block:nth-child(3) { animation-delay: 0.19s; }
+
+  .section-label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .section-label::before {
+    content: '';
+    width: 14px; height: 2px;
+    background: var(--accent);
+    border-radius: 1px;
+    flex-shrink: 0;
+  }
+
+  .section-text { font-size: 13px; line-height: 1.75; color: #c4c4c4; letter-spacing: 0.01em; }
+
+  .formula-box {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: var(--r-sm);
+    padding: 14px 18px;
+    text-align: center;
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+  .formula { font-size: clamp(18px, 3vw, 24px); font-weight: 700; letter-spacing: 0.1em; margin-bottom: 8px; user-select: none; }
+  .formula-desc { font-size: 11px; color: var(--text-dim); line-height: 1.6; letter-spacing: 0.03em; }
+
+  .task-block {
+    background: rgba(91,91,214,0.08);
+    border: 1px solid rgba(91,91,214,0.3);
+    border-radius: var(--r-md);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    animation: fadeUp 0.4s ease 0.26s both;
+  }
+  .task-label { font-size: 13px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #8b8be8; }
+  .task-text { font-size: 14px; line-height: 1.7; color: #c4c4c4; }
+  .task-inputs { display: flex; flex-direction: column; gap: 12px; }
+  .input-row { display: flex; align-items: center; gap: 10px; overflow: visible; }
+  .input-row label { font-size: 14px; color: var(--text-dim); min-width: 60px; flex-shrink: 0; letter-spacing: 0.02em; }
+  .task-input {
+    flex: 1;
+    min-width: 0;
+    background: var(--surface);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: var(--r-sm);
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .task-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+  .task-input::-webkit-outer-spin-button,
+  .task-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .task-input[type=number] { -moz-appearance: textfield; }
+  .task-unit { font-size: 14px; color: var(--text-dim); min-width: 24px; padding-right: 4px; }
+  .task-check {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--r-sm);
+    padding: 11px 24px;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    align-self: stretch;
+    box-shadow: 0 2px 12px var(--accent-glow);
+  }
+  .task-check:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
+  .task-result { font-size: 13px; padding: 10px 14px; border-radius: var(--r-sm); display: none; letter-spacing: 0.02em; line-height: 1.5; }
+  .task-result.correct { display: block; background: rgba(52,199,89,0.12); border: 1px solid rgba(52,199,89,0.3); color: #5fd87b; }
+  .task-result.wrong   { display: block; background: rgba(255,69,58,0.1);  border: 1px solid rgba(255,69,58,0.3);  color: #ff6b6b; }
+
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-12px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(16px);  } to { opacity:1; transform:translateY(0); } }
+
+  /* ── Quiz Screen ── */
+  .quiz-screen {
+    display: none;
+    width: 100%;
+    height: 100vh;
+    flex-direction: column;
+    overflow: hidden;
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 200;
+  }
+  .quiz-screen.active { display: flex; }
+
+  .quiz-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 24px 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-content: center;
+  }
+  .quiz-body::-webkit-scrollbar { width: 4px; }
+  .quiz-body::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+
+  .quiz-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    animation: fadeUp 0.4s ease both;
+  }
+  .quiz-card:nth-child(1) { animation-delay: 0.05s; }
+  .quiz-card:nth-child(2) { animation-delay: 0.10s; }
+  .quiz-card:nth-child(3) { animation-delay: 0.15s; }
+  .quiz-card:nth-child(4) { animation-delay: 0.20s; }
+  .quiz-card:nth-child(5) { animation-delay: 0.25s; }
+  .quiz-card:nth-child(6) { animation-delay: 0.30s; }
+
+  .quiz-num {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .quiz-num::before { content: ''; width: 14px; height: 2px; background: var(--accent); border-radius: 1px; }
+
+  .quiz-question {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .quiz-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--text);
+    text-align: left;
+    width: 100%;
+  }
+  .quiz-option:hover { border-color: var(--accent); background: rgba(91,91,214,0.08); transform: translateX(2px); }
+  .quiz-option.selected { border-color: var(--accent); background: rgba(91,91,214,0.15); box-shadow: 0 0 0 1px var(--accent); }
+  .quiz-option.correct  { border-color: #34c759; background: rgba(52,199,89,0.12); color: #5fd87b; }
+  .quiz-option.wrong    { border-color: #ff453a; background: rgba(255,69,58,0.10); color: #ff6b6b; }
+  .quiz-option.reveal-correct { border-color: #34c759; background: rgba(52,199,89,0.08); color: #5fd87b; }
+  .quiz-option:disabled { cursor: default; transform: none; }
+
+  .quiz-option-key {
+    width: 24px; height: 24px;
+    min-width: 24px;
+    background: var(--surface3);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0;
+    color: var(--text-dim);
+    transition: background 0.2s, color 0.2s;
+  }
+  .quiz-option.selected .quiz-option-key { background: var(--accent); color: #fff; }
+  .quiz-option.correct .quiz-option-key  { background: #34c759; color: #fff; }
+  .quiz-option.wrong .quiz-option-key    { background: #ff453a; color: #fff; }
+  .quiz-option.reveal-correct .quiz-option-key { background: #34c759; color: #fff; }
+
+  .quiz-result-banner {
+    display: none;
+    padding: 10px 14px;
+    border-radius: var(--r-sm);
+    font-size: 13px;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+  }
+  .quiz-result-banner.correct { display: block; background: rgba(52,199,89,0.12); border: 1px solid rgba(52,199,89,0.3); color: #5fd87b; }
+  .quiz-result-banner.wrong   { display: block; background: rgba(255,69,58,0.10);  border: 1px solid rgba(255,69,58,0.3);  color: #ff6b6b; }
+
+  @media (max-width: 760px) {
+    .quiz-body { grid-template-columns: 1fr; padding: 16px; }
+  }
+
+  /* ── Topic Picker Modal ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 300;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(3px);
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+
+  .topic-modal {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -44%) scale(0.95);
+    width: min(480px, 92vw);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    z-index: 301;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.32,0.72,0,1);
+    overflow: hidden;
+  }
+  .topic-modal.show {
+    opacity: 1;
+    pointer-events: all;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .modal-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .topic-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s, background 0.2s;
+    text-align: left;
+    width: 100%;
+    color: var(--text);
+    font-family: var(--font);
+    animation: fadeUp 0.3s ease both;
+  }
+  .topic-btn:nth-child(1) { animation-delay: 0.05s; }
+  .topic-btn:nth-child(2) { animation-delay: 0.10s; }
+  .topic-btn:nth-child(3) { animation-delay: 0.15s; }
+  .topic-btn:nth-child(4) { animation-delay: 0.20s; }
+  .topic-btn:nth-child(5) { animation-delay: 0.25s; }
+  .topic-btn:hover {
+    border-color: var(--accent);
+    background: rgba(91,91,214,0.08);
+    box-shadow: 0 0 0 1px var(--accent), 0 4px 16px var(--accent-glow);
+    transform: translateX(3px);
+  }
+
+  .topic-icon {
+    font-size: 22px;
+    width: 36px;
+    min-width: 36px;
+    max-width: 36px;
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .topic-name {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin-bottom: 3px;
+  }
+
+  .topic-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+
+  @media (max-width: 760px) {
+    html, body { overflow-y: auto; }
+    .slide { height: auto; min-height: 100vh; }
+    .body { grid-template-columns: 1fr; height: auto; }
+    .center-panel { order: -1; min-height: 240px; }
+    .panel.left-panel  { order: 0; }
+    .panel.right-panel { order: 1; }
+    .panel-buttons { min-height: 180px; }
+    .drawer { width: 100vw; }
+    .drawer.left, .drawer.right { left: 0; right: 0; top: auto; bottom: 0; height: 85vh; transform: translateY(110%); border: none; border-top: 1px solid var(--border); border-radius: var(--r-lg) var(--r-lg) 0 0; }
+    .drawer.open.left, .drawer.open.right { transform: translateY(0); }
+  }
+  @media (max-width: 520px) {
+    .header { padding: 14px 16px; }
+    .footer { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .btn-next { width: 100%; text-align: center; }
+    .body { padding: 10px; gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="slide">
+  <div class="header">
+    <h1>Основи електротехніки: Від фізики до логіки</h1>
+  </div>
+
+  <div class="body">
+    <!-- LEFT -->
+    <div class="panel left-panel">
+      <div class="panel-title">Теоретична база</div>
+      <div class="panel-buttons">
+        <button class="menu-btn" onclick="openDrawer('ohm','left',event)">
+          <div class="btn-icon">⚡</div>
+          <span class="btn-label">Закон Ома</span>
+        </button>
+        <button class="menu-btn" onclick="openDrawer('kirchhoff','left',event)">
+          <div class="btn-icon">🔀</div>
+          <span class="btn-label">Закон Кірхгофа</span>
+        </button>
+        <button class="menu-btn" onclick="openDrawer('power','left',event)">
+          <div class="btn-icon">💡</div>
+          <span class="btn-label">Потужність струму</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- CENTER -->
+    <div class="center-panel">
+      <div class="center-title">Віртуальна лабораторія (pHet)</div>
+      <div class="phet-wrapper">
+        <iframe id="phet-iframe" src="" allow="fullscreen"></iframe>
+        <div class="phet-frame" id="phet-frame" onclick="launchSim()">
+          <span class="phet-label">▶ Запустити симуляцію</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="panel right-panel">
+      <div class="panel-title">Апаратна логіка</div>
+      <div class="panel-buttons">
+        <button class="menu-btn" onclick="openDrawer('and','right',event)">
+          <div class="btn-icon">🔲</div>
+          <span class="btn-label">Вентиль AND</span>
+        </button>
+        <button class="menu-btn" onclick="openDrawer('or','right',event)">
+          <div class="btn-icon">🔁</div>
+          <span class="btn-label">Вентиль OR</span>
+        </button>
+        <button class="menu-btn" onclick="openDrawer('trigger','right',event)">
+          <div class="btn-icon">🔄</div>
+          <span class="btn-label">Тригер</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="footer-text" id="footer-text">Ознайомтесь із теорією або почніть практичний експеримент</span>
+    <button class="btn-next" onclick="showQuiz()">Далі →</button>
+  </div>
+</div>
+
+<!-- QUIZ SCREEN -->
+<div class="quiz-screen" id="quiz-screen">
+  <div class="header">
+    <h1>Підсумкове завдання: Закріплення знань</h1>
+  </div>
+  <div class="quiz-body" id="quiz-body"></div>
+  <div class="footer">
+    <button class="btn-next" onclick="showMain()">← Назад</button>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span class="footer-text" id="quiz-score"></span>
+      <button class="btn-next" id="quiz-submit" onclick="submitQuiz()">Перевірити всі →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOPIC PICKER MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal()"></div>
+<div class="topic-modal" id="topic-modal">
+  <div class="modal-header">
+    <div class="drawer-title">🎯 Оберіть тему для тестування</div>
+    <button class="drawer-close" onclick="closeModal()">✕</button>
+  </div>
+  <div class="modal-body">
+    <button class="topic-btn" onclick="startQuiz('all')">
+      <span class="topic-icon">📚</span>
+      <div><div class="topic-name">Всі теми</div><div class="topic-desc">6 питань — повне закріплення</div></div>
+    </button>
+    <button class="topic-btn" onclick="startQuiz('electricity')">
+      <span class="topic-icon">⚡</span>
+      <div><div class="topic-name">Закон Ома</div><div class="topic-desc">Напруга, струм, опір</div></div>
+    </button>
+    <button class="topic-btn" onclick="startQuiz('kirchhoff')">
+      <span class="topic-icon">🔀</span>
+      <div><div class="topic-name">Закон Кірхгофа</div><div class="topic-desc">Вузли та контури</div></div>
+    </button>
+    <button class="topic-btn" onclick="startQuiz('power')">
+      <span class="topic-icon">💡</span>
+      <div><div class="topic-name">Потужність струму</div><div class="topic-desc">P = U·I та P = I²·R</div></div>
+    </button>
+    <button class="topic-btn" onclick="startQuiz('logic')">
+      <span class="topic-icon">🔲🔁🔄</span>
+      <div><div class="topic-name">Апаратна логіка</div><div class="topic-desc">AND, OR, Тригер</div></div>
+    </button>
+  </div>
+</div>
+
+<div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
+
+<div class="drawer left" id="drawer-left">
+  <div class="drawer-header">
+    <div class="drawer-title" id="title-left"></div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="body-left"></div>
+</div>
+
+<div class="drawer right" id="drawer-right">
+  <div class="drawer-header">
+    <div class="drawer-title" id="title-right"></div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="body-right"></div>
+</div>
+
+<script>
+const CONTENT = {
+  ohm: {
+    title: '<span class="icon">⚡</span> Закон Ома',
+    html: `
+      <div class="section-block">
+        <div class="section-label">Теорія</div>
+        <div class="section-text">
+          Закон Ома — фундаментальний закон електротехніки, що описує зв'язок між напругою, струмом та опором у провіднику.<br><br>
+          Чим більший опір матеріалу — тим менший струм протікає при тій самій напрузі. Саме цей принцип лежить в основі будь-якої електричної схеми: від зарядки телефону до процесорів.
+        </div>
+      </div>
+      <div class="section-block">
+        <div class="section-label">Формула</div>
+        <div class="formula-box">
+          <div class="formula">I = U / R</div>
+          <div class="formula-desc">I — сила струму (А) &nbsp;·&nbsp; U — напруга (В) &nbsp;·&nbsp; R — опір (Ом)</div>
+        </div>
+      </div>
+      <div class="task-block">
+        <div class="task-label">🧪 Практичне завдання</div>
+        <div class="task-text">У колі напруга <strong style="color:#e8e8e8">U = 12 В</strong>, опір резистора <strong style="color:#e8e8e8">R = 4 Ом</strong>. Розрахуй силу струму.</div>
+        <div class="task-inputs">
+          <div class="input-row">
+            <label>Відповідь:</label>
+            <input class="task-input" type="number" id="ohm-ans" placeholder="0.00">
+            <span class="task-unit">А</span>
+          </div>
+          <button class="task-check" onclick="check('ohm-ans',3,'ohm-res')">Перевірити</button>
+          <div class="task-result" id="ohm-res"></div>
+        </div>
+      </div>`
+  },
+  kirchhoff: {
+    title: '<span class="icon">🔀</span> Закон Кірхгофа',
+    html: `
+      <div class="section-block">
+        <div class="section-label">Теорія</div>
+        <div class="section-text">
+          Кірхгоф сформулював два закони для розгалужених кіл.<br><br>
+          <strong style="color:#e8e8e8">1-й закон (вузлів):</strong> сума струмів у вузлі дорівнює нулю. Скільки прийшло — стільки й пішло.<br><br>
+          <strong style="color:#e8e8e8">2-й закон (контурів):</strong> алгебраїчна сума напруг у замкненому контурі дорівнює нулю.
+        </div>
+      </div>
+      <div class="section-block">
+        <div class="section-label">Формули</div>
+        <div class="formula-box">
+          <div class="formula">ΣI = 0</div>
+          <div class="formula-desc" style="margin-bottom:10px">Перший закон: вузловий</div>
+          <div class="formula">ΣU = 0</div>
+          <div class="formula-desc">Другий закон: контурний</div>
+        </div>
+      </div>
+      <div class="task-block">
+        <div class="task-label">🧪 Практичне завдання</div>
+        <div class="task-text">У вузол входять <strong style="color:#e8e8e8">I₁ = 3 А</strong> та <strong style="color:#e8e8e8">I₂ = 5 А</strong>. Знайди I₃ що виходить.</div>
+        <div class="task-inputs">
+          <div class="input-row">
+            <label>I₃ =</label>
+            <input class="task-input" type="number" id="kir-ans" placeholder="0">
+            <span class="task-unit">А</span>
+          </div>
+          <button class="task-check" onclick="check('kir-ans',8,'kir-res')">Перевірити</button>
+          <div class="task-result" id="kir-res"></div>
+        </div>
+      </div>`
+  },
+  power: {
+    title: '<span class="icon">💡</span> Потужність струму',
+    html: `
+      <div class="section-block">
+        <div class="section-label">Теорія</div>
+        <div class="section-text">
+          Потужність — це кількість енергії, що перетворюється в колі за одиницю часу. Вона визначає, скільки тепла виділяє резистор або скільки світла дає лампа.<br><br>
+          Чим вища потужність — тим більше енергії споживає пристрій за секунду.
+        </div>
+      </div>
+      <div class="section-block">
+        <div class="section-label">Формули</div>
+        <div class="formula-box">
+          <div class="formula">P = U · I</div>
+          <div class="formula-desc" style="margin-bottom:10px">P — потужність (Вт) &nbsp;·&nbsp; U — напруга (В) &nbsp;·&nbsp; I — струм (А)</div>
+          <div class="formula">P = I² · R</div>
+          <div class="formula-desc">Через опір та струм</div>
+        </div>
+      </div>
+      <div class="task-block">
+        <div class="task-label">🧪 Практичне завдання</div>
+        <div class="task-text">Через резистор <strong style="color:#e8e8e8">R = 10 Ом</strong> протікає <strong style="color:#e8e8e8">I = 2 А</strong>. Розрахуй потужність.</div>
+        <div class="task-inputs">
+          <div class="input-row">
+            <label>P =</label>
+            <input class="task-input" type="number" id="pow-ans" placeholder="0">
+            <span class="task-unit">Вт</span>
+          </div>
+          <button class="task-check" onclick="check('pow-ans',40,'pow-res')">Перевірити</button>
+          <div class="task-result" id="pow-res"></div>
+        </div>
+      </div>`
+  },
+  and: {
+    title: '<span class="icon">🔲</span> Вентиль AND',
+    html: `
+      <div class="section-block">
+        <div class="section-label">Теорія</div>
+        <div class="section-text">
+          AND-вентиль дає «1» на виході лише тоді, коли <strong style="color:#e8e8e8">всі</strong> входи одночасно «1».<br><br>
+          Аналог — два вимикачі послідовно: лампа горить тільки якщо обидва ввімкнені. В схемах AND реалізують транзисторами у послідовному з'єднанні.
+        </div>
+      </div>
+      <div class="section-block">
+        <div class="section-label">Таблиця істинності</div>
+        <div class="formula-box">
+          <div class="formula">Y = A · B</div>
+          <div class="formula-desc">0·0=0 &nbsp;|&nbsp; 0·1=0 &nbsp;|&nbsp; 1·0=0 &nbsp;|&nbsp; 1·1=1</div>
+        </div>
+      </div>
+      <div class="task-block">
+        <div class="task-label">🧪 Практичне завдання</div>
+        <div class="task-text">На AND-вентиль подано <strong style="color:#e8e8e8">A = 1</strong> та <strong style="color:#e8e8e8">B = 0</strong>. Чому дорівнює Y?</div>
+        <div class="task-inputs">
+          <div class="input-row">
+            <label>Y =</label>
+            <input class="task-input" type="number" id="and-ans" placeholder="0 або 1" min="0" max="1">
+            <span class="task-unit"></span>
+          </div>
+          <button class="task-check" onclick="check('and-ans',0,'and-res')">Перевірити</button>
+          <div class="task-result" id="and-res"></div>
+        </div>
+      </div>`
+  },
+  or: {
+    title: '<span class="icon">🔁</span> Вентиль OR',
+    html: `
+      <div class="section-block">
+        <div class="section-label">Теорія</div>
+        <div class="section-text">
+          OR-вентиль дає «1», якщо <strong style="color:#e8e8e8">хоча б один</strong> вхід «1». «0» — лише коли всі входи «0».<br><br>
+          Аналог — два вимикачі паралельно: лампа горить якщо хоча б один ввімкнений.
+        </div>
+      </div>
+      <div class="section-block">
+        <div class="section-label">Таблиця істинності</div>
+        <div class="formula-box">
+          <div class="formula">Y = A + B</div>
+          <div class="formula-desc">0+0=0 &nbsp;|&nbsp; 0+1=1 &nbsp;|&nbsp; 1+0=1 &nbsp;|&nbsp; 1+1=1</div>
+        </div>
+      </div>
+      <div class="task-block">
+        <div class="task-label">🧪 Практичне завдання</div>
+        <div class="task-text">На OR-вентиль подано <strong style="color:#e8e8e8">A = 0</strong> та <strong style="color:#e8e8e8">B = 0</strong>. Визнач Y.</div>
+        <div class="task-inputs">
+          <div class="input-row">
+            <label>Y =</label>
+            <input class="task-input" type="number" id="or-ans" placeholder="0 або 1" min="0" max="1">
+            <span class="task-unit"></span>
+          </div>
+          <button class="task-check" onclick="check('or-ans',0,'or-res')">Перевірити</button>
+          <div class="task-result" id="or-res"></div>
+        </div>
+      </div>`
+  },
+  trigger: {
+    title: '<span class="icon">🔄</span> Тригер',
+    html: `
+      <div class="section-block">
+        <div class="section-label">Теорія</div>
+        <div class="section-text">
+          Тригер — елемент пам'яті цифрової електроніки. Він <strong style="color:#e8e8e8">зберігає стан</strong> (0 або 1) після зникнення вхідного сигналу.<br><br>
+          RS-тригер: S (Set) встановлює «1», R (Reset) скидає в «0». Тригери — основа регістрів, лічильників та RAM.
+        </div>
+      </div>
+      <div class="section-block">
+        <div class="section-label">RS-тригер</div>
+        <div class="formula-box">
+          <div class="formula">Q(t+1) = S + Q·R̄</div>
+          <div class="formula-desc">S=1, R=0 → Q=1 &nbsp;|&nbsp; S=0, R=1 → Q=0 &nbsp;|&nbsp; S=0, R=0 → Q без змін</div>
+        </div>
+      </div>
+      <div class="task-block">
+        <div class="task-label">🧪 Практичне завдання</div>
+        <div class="task-text">Тригер у стані <strong style="color:#e8e8e8">Q = 0</strong>. Подаємо <strong style="color:#e8e8e8">S = 1</strong>, <strong style="color:#e8e8e8">R = 0</strong>. Новий стан Q?</div>
+        <div class="task-inputs">
+          <div class="input-row">
+            <label>Q =</label>
+            <input class="task-input" type="number" id="tr-ans" placeholder="0 або 1" min="0" max="1">
+            <span class="task-unit"></span>
+          </div>
+          <button class="task-check" onclick="check('tr-ans',1,'tr-res')">Перевірити</button>
+          <div class="task-result" id="tr-res"></div>
+        </div>
+      </div>`
+  }
+};
+
+let currentDrawer = null;
+
+function openDrawer(key, side, e) {
+  const data = CONTENT[key];
+  if (!data) return;
+  closeDrawer(true);
+  const drawer  = document.getElementById('drawer-' + side);
+  const titleEl = document.getElementById('title-' + side);
+  const bodyEl  = document.getElementById('body-' + side);
+  titleEl.innerHTML = data.title;
+  bodyEl.innerHTML  = data.html;
+  document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+  e.currentTarget.classList.add('active');
+  document.getElementById('footer-text').textContent = data.title.replace(/<[^>]+>/g,'').trim();
+  requestAnimationFrame(() => {
+    document.getElementById('overlay').classList.add('show');
+    drawer.classList.add('open');
+  });
+  currentDrawer = { drawer, side };
+}
+
+function closeDrawer(silent = false) {
+  document.getElementById('drawer-left').classList.remove('open');
+  document.getElementById('drawer-right').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+  document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+  if (!silent) document.getElementById('footer-text').textContent = 'Ознайомтесь із теорією або почніть практичний експеримент';
+  currentDrawer = null;
+}
+
+function check(inputId, correct, resultId) {
+  const val = parseFloat(document.getElementById(inputId).value);
+  const res = document.getElementById(resultId);
+  if (isNaN(val)) { res.className = 'task-result wrong'; res.textContent = '⚠ Введи числове значення'; return; }
+  if (Math.abs(val - correct) < 0.01) { res.className = 'task-result correct'; res.textContent = `✓ Правильно! Відповідь: ${correct}`; }
+  else { res.className = 'task-result wrong'; res.textContent = '✗ Невірно. Спробуй ще раз.'; }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+const QUIZ_ALL = [
+  { topic: 'electricity',
+    q: 'Напруга в колі U = 24 В, опір R = 6 Ом. Чому дорівнює сила струму I?',
+    options: ['2 А', '4 А', '6 А', '144 А'],
+    correct: 1, explain: 'За законом Ома: I = U / R = 24 / 6 = 4 А' },
+  { topic: 'electricity',
+    q: 'Опір резистора R = 8 Ом, струм I = 0.5 А. Яка напруга на ньому?',
+    options: ['16 В', '4 В', '8 В', '0.0625 В'],
+    correct: 1, explain: 'За законом Ома: U = I · R = 0.5 · 8 = 4 В' },
+  { topic: 'kirchhoff',
+    q: 'Що стверджує перший закон Кірхгофа?',
+    options: ['Сума напруг у контурі = 0', 'Сума струмів у вузлі = 0', 'Опір залежить від температури', 'P = U · I'],
+    correct: 1, explain: 'Перший закон Кірхгофа — вузловий: ΣI = 0' },
+  { topic: 'kirchhoff',
+    q: 'У вузол входять I₁ = 2 А та I₂ = 7 А. Який струм виходить?',
+    options: ['5 А', '14 А', '9 А', '4 А'],
+    correct: 2, explain: 'За першим законом Кірхгофа: I₃ = I₁ + I₂ = 2 + 7 = 9 А' },
+  { topic: 'power',
+    q: 'Через резистор R = 5 Ом протікає струм I = 3 А. Яка потужність?',
+    options: ['8 Вт', '15 Вт', '45 Вт', '25 Вт'],
+    correct: 2, explain: 'P = I² · R = 9 · 5 = 45 Вт' },
+  { topic: 'power',
+    q: 'Напруга U = 10 В, струм I = 2 А. Яка потужність?',
+    options: ['5 Вт', '12 Вт', '20 Вт', '8 Вт'],
+    correct: 2, explain: 'P = U · I = 10 · 2 = 20 Вт' },
+  { topic: 'logic',
+    q: 'На AND-вентиль подано A = 1, B = 1. Що на виході?',
+    options: ['0', '1', 'Невизначено', 'Залежить від напруги'],
+    correct: 1, explain: 'AND дає 1 тільки коли обидва входи = 1. Тут 1·1 = 1' },
+  { topic: 'logic',
+    q: 'На OR-вентиль подано A = 0, B = 1. Що на виході?',
+    options: ['0', '1', 'Помилка', '0.5'],
+    correct: 1, explain: 'OR дає 1 якщо хоча б один вхід = 1. Тут 0+1 = 1' },
+  { topic: 'logic',
+    q: 'RS-тригер у стані Q = 1. Подаємо R = 1, S = 0. Новий стан Q?',
+    options: ['Q = 1 (не змінюється)', 'Q = 0 (скидається)', 'Q = невизначено', 'Q = 2'],
+    correct: 1, explain: 'R = Reset скидає тригер у 0. Новий стан Q = 0' }
+];
+
+let QUIZ = [];
+const userAnswers = [];
+let submitted = false;
+
+function showQuiz() {
+  closeDrawer(true);
+  document.getElementById('modal-overlay').classList.add('show');
+  document.getElementById('topic-modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('show');
+  document.getElementById('topic-modal').classList.remove('show');
+}
+
+function startQuiz(topic) {
+  closeModal();
+  QUIZ = topic === 'all' ? [...QUIZ_ALL] : QUIZ_ALL.filter(q => q.topic === topic);
+  userAnswers.length = 0;
+  for (let i = 0; i < QUIZ.length; i++) userAnswers.push(null);
+  submitted = false;
+  document.getElementById('quiz-submit').textContent = 'Перевірити всі →';
+  document.getElementById('quiz-submit').onclick = submitQuiz;
+  document.getElementById('quiz-submit').disabled = false;
+  document.getElementById('quiz-score').textContent = '';
+  document.querySelector('.slide').style.display = 'none';
+  document.getElementById('quiz-screen').classList.add('active');
+  renderQuiz();
+}
+
+function showMain() {
+  document.querySelector('.slide').style.display = 'flex';
+  document.getElementById('quiz-screen').classList.remove('active');
+}
+
+function renderQuiz() {
+  const body = document.getElementById('quiz-body');
+  body.innerHTML = QUIZ.map((q, qi) => `
+    <div class="quiz-card" id="qcard-${qi}">
+      <div class="quiz-num">Питання ${qi + 1} з ${QUIZ.length}</div>
+      <div class="quiz-question">${q.q}</div>
+      <div class="quiz-options">
+        ${q.options.map((opt, oi) => `
+          <button class="quiz-option" id="qopt-${qi}-${oi}" onclick="selectOption(${qi}, ${oi})">
+            <span class="quiz-option-key">${String.fromCharCode(65 + oi)}</span>
+            ${opt}
+          </button>
+        `).join('')}
+      </div>
+      <div class="quiz-result-banner" id="qres-${qi}"></div>
+    </div>
+  `).join('');
+}
+
+function selectOption(qi, oi) {
+  if (submitted) return;
+  userAnswers[qi] = oi;
+  QUIZ[qi].options.forEach((_, i) => {
+    const btn = document.getElementById(`qopt-${qi}-${i}`);
+    btn.classList.toggle('selected', i === oi);
+  });
+}
+
+function submitQuiz() {
+  const unanswered = userAnswers.filter(a => a === null).length;
+  if (unanswered > 0) {
+    document.getElementById('quiz-score').textContent = `⚠ Дай відповідь на всі питання (${unanswered} залишилось)`;
+    return;
+  }
+  submitted = true;
+  let correct = 0;
+  QUIZ.forEach((q, qi) => {
+    const chosen = userAnswers[qi];
+    const isCorrect = chosen === q.correct;
+    if (isCorrect) correct++;
+
+    q.options.forEach((_, oi) => {
+      const btn = document.getElementById(`qopt-${qi}-${oi}`);
+      btn.disabled = true;
+      btn.classList.remove('selected');
+      if (oi === chosen && isCorrect)  btn.classList.add('correct');
+      if (oi === chosen && !isCorrect) btn.classList.add('wrong');
+      if (oi === q.correct && !isCorrect) btn.classList.add('reveal-correct');
+    });
+
+    const res = document.getElementById(`qres-${qi}`);
+    if (isCorrect) {
+      res.className = 'quiz-result-banner correct';
+      res.textContent = `✓ Правильно! ${q.explain}`;
+    } else {
+      res.className = 'quiz-result-banner wrong';
+      res.textContent = `✗ Невірно. ${q.explain}`;
+    }
+  });
+
+  const pct = Math.round(correct / QUIZ.length * 100);
+  const emoji = pct === 100 ? '🏆' : pct >= 66 ? '👍' : '📚';
+  document.getElementById('quiz-score').textContent = `${emoji} Результат: ${correct} / ${QUIZ.length} (${pct}%)`;
+  document.getElementById('quiz-submit').textContent = 'Ще раз';
+  document.getElementById('quiz-submit').onclick = resetQuiz;
+}
+
+function resetQuiz() {
+  submitted = false;
+  userAnswers.fill(null);
+  document.getElementById('quiz-score').textContent = '';
+  document.getElementById('quiz-submit').textContent = 'Перевірити всі →';
+  document.getElementById('quiz-submit').onclick = submitQuiz;
+  renderQuiz();
+}
+
+function launchSim() {
+  const frame = document.getElementById('phet-frame');
+  const iframe = document.getElementById('phet-iframe');
+  iframe.src = 'https://phet.colorado.edu/sims/html/circuit-construction-kit-dc-virtual-lab/latest/circuit-construction-kit-dc-virtual-lab_all.html?locale=uk';
+  frame.style.opacity = '0';
+  frame.style.pointerEvents = 'none';
+  setTimeout(() => { frame.style.display = 'none'; }, 500);
+}
+</script>
+</body>
+</html>
